@@ -5,7 +5,7 @@ use strict;
 use Dancer::Plugin;
 use Audio::MPD;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 my $mpd;
 
 register mpd => sub {
@@ -26,14 +26,14 @@ sub _connect {
     # (MPD listening on localhost, on port 6600, with no password set), no
     # configuration will be needed at all.
     my %mpd_conf;
-    for my $setting (qw(host port password)) {
+    for my $setting (qw(host port password conntype)) {
         $mpd_conf{$setting} = $conf->{$setting} if exists $conf->{$setting};
     }
 
     # Audio::MPD's default conntype is 'once', which re-establishes a connection
     # for every request.  For performance, we probably want to re-use a
     # connection.
-    $conf->{conntype} ||= 'reuse';
+    $mpd_conf{conntype} ||= 'reuse';
 
     return  Audio::MPD->new(\%mpd_conf);
 }
@@ -48,7 +48,7 @@ Dancer::Plugin::MPD - easy connection to MPD from Dancer apps
 
 =head1 DESCRIPTION
 
-Provides an easy way to connect to MPD (L<www.wusicpd.org>) from a L<Dancer>
+Provides an easy way to connect to MPD (L<www.musicpd.org>) from a L<Dancer>
 app.  Handles obtaining the connection, making sure the connection is still
 alive, and reconnecting if not.
 
@@ -64,9 +64,30 @@ connection.
     mpd->next;
 
 
+=head1 CONFIGURATION
+
+L<Audio::MPD> does sensible things by default, so in the majority of cases (MPD
+running on the same host as the app, no password needed, and happy to reuse the
+connection for performance), no configuration will be required at all.
+
+However, the following config settings can be used in your app's C<config.yml>:
+
+    plugins:
+        MPD:
+            host: localhost
+            port: 6600
+            password: verysecret
+            conntype: reuse
+
+
 =head1 AUTHOR
 
 David Precious, C<< <davidp at preshweb.co.uk> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+Alan Berndt
+
 
 =head1 BUGS
 
@@ -110,7 +131,7 @@ L<http://search.cpan.org/dist/Dancer-Plugin-MPD/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010 David Precious.
+Copyright 2010-11 David Precious.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
