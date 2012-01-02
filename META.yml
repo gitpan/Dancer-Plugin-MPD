@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Dancer-Plugin-MPD
-version:            0.02
+version:            0.03
 abstract:           easy connection to MPD from Dancer apps
 author:
     - David Precious <davidp@preshweb.co.uk>
